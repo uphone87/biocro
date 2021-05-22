@@ -1,4 +1,4 @@
-useDynLib(BioCro,
+useDynLib(BioCroSoyBean,
 		  R_Gro_solver,
 		  R_Gro_deriv,
 		  R_Gro_ode,
