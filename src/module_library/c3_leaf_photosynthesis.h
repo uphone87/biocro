@@ -52,7 +52,8 @@ class c3_leaf_photosynthesis : public SteadyModule
           TransR_op(get_op(output_parameters, "TransR")),
           EPenman_op(get_op(output_parameters, "EPenman")),
           EPriestly_op(get_op(output_parameters, "EPriestly")),
-          leaf_temperature_op(get_op(output_parameters, "leaf_temperature"))
+          leaf_temperature_op(get_op(output_parameters, "leaf_temperature")),
+          min_index_op(get_op(output_parameters, "min_index"))
     {
     }
     static std::vector<std::string> get_inputs();
@@ -93,6 +94,7 @@ class c3_leaf_photosynthesis : public SteadyModule
     double* EPenman_op;
     double* EPriestly_op;
     double* leaf_temperature_op;
+    double* min_index_op;
 
     // Main operation
     void do_operation() const;
@@ -137,7 +139,8 @@ std::vector<std::string> c3_leaf_photosynthesis::get_outputs()
         "TransR",           // mmol / m^2 / s
         "EPenman",          // mmol / m^2 / s
         "EPriestly",        // mmol / m^2 / s
-        "leaf_temperature"  // deg. C
+        "leaf_temperature", // deg. C
+        "min_index"       
     };
 }
 
@@ -177,6 +180,7 @@ void c3_leaf_photosynthesis::do_operation() const
     update(EPenman_op, et.EPenman);
     update(EPriestly_op, et.EPriestly);
     update(leaf_temperature_op, leaf_temperature);
+    update(min_index_op, photo.min_index);
 }
 
 #endif

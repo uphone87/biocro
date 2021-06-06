@@ -29,11 +29,13 @@ class multilayer_canopy_integrator : public SteadyModule
           sunlit_GrossAssim_ips(get_multilayer_ip(input_parameters, nlayers, "sunlit_GrossAssim")),
           sunlit_Gs_ips(get_multilayer_ip(input_parameters, nlayers, "sunlit_Gs")),
           sunlit_TransR_ips(get_multilayer_ip(input_parameters, nlayers, "sunlit_TransR")),
+          sunlit_min_index_ips(get_multilayer_ip(input_parameters, nlayers, "sunlit_min_index")),
           shaded_fraction_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_fraction")),
           shaded_Assim_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_Assim")),
           shaded_GrossAssim_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_GrossAssim")),
           shaded_Gs_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_Gs")),
           shaded_TransR_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_TransR")),
+          shaded_min_index_ips(get_multilayer_ip(input_parameters, nlayers, "shaded_min_index")),
           // Get references to input parameters
           lai(get_input(input_parameters, "lai")),
           growth_respiration_fraction(get_input(input_parameters, "growth_respiration_fraction")),
@@ -54,11 +56,13 @@ class multilayer_canopy_integrator : public SteadyModule
     const std::vector<const double*> sunlit_GrossAssim_ips;
     const std::vector<const double*> sunlit_Gs_ips;
     const std::vector<const double*> sunlit_TransR_ips;
+    const std::vector<const double*> sunlit_min_index_ips;
     const std::vector<const double*> shaded_fraction_ips;
     const std::vector<const double*> shaded_Assim_ips;
     const std::vector<const double*> shaded_GrossAssim_ips;
     const std::vector<const double*> shaded_Gs_ips;
     const std::vector<const double*> shaded_TransR_ips;
+    const std::vector<const double*> shaded_min_index_ips;
     // References to input parameters
     const double& lai;
     const double& growth_respiration_fraction;
@@ -90,11 +94,13 @@ std::vector<std::string> multilayer_canopy_integrator::get_inputs(int nlayers)
         "sunlit_GrossAssim",  // micromole / m^2 /s
         "sunlit_Gs",          // mmol / m^2 / s
         "sunlit_TransR",      // mol / m^2 / s
+        "sunlit_min_index",      // mol / m^2 / s
         "shaded_fraction",    // dimensionless
         "shaded_Assim",       // micromole / m^2 /s
         "shaded_GrossAssim",  // micromole / m^2 /s
         "shaded_Gs",          // mmol / m^2 / s
         "shaded_TransR",      // mol / m^2 / s
+        "shaded_min_index",      // mol / m^2 / s
     };
 
     // Get the full list by appending layer numbers

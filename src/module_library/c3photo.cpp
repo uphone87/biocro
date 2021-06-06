@@ -84,6 +84,7 @@ struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, dou
     //
     int iterCounter = 0;
     int max_iter = 1000;
+    double min_ind;
     while (iterCounter < max_iter) {
         quantity<flux> OldAssim = co2_assimilation_rate;
 
@@ -105,12 +106,15 @@ struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, dou
 
         if(Ac < Aj && Ac < Ap){
             Vc = Ac;
+            min_ind  = 1.0;
         } else if (Aj < Ac && Aj < Ap){
             Vc = Aj;
+            min_ind  = 2.0;
         } else if (Ap < Ac && Ap < Aj){
             if (Ap < 0 * mole / square_meter / second)
                 Ap = 0 * mole / square_meter / second;
             Vc = Ap;
+            min_ind  = 3.0;
         }
 
         co2_assimilation_rate = Vc - Rd;
@@ -146,6 +150,7 @@ struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, dou
     result.Gs = Gs.value() * 1e3;  // mmol / m^2 / s.
     result.Ci = Ci.value() * 1e6;  // micromole / mol.
     result.GrossAssim = (co2_assimilation_rate.value() + Rd.value()) * 1e6;  // micromole / m^2 / s.
+    result.min_index = min_ind; 
     return result;
 }
 

@@ -10,7 +10,7 @@ struct c3_str {
     double Gs;
     double Ci;
     double GrossAssim;
-
+    double min_index;
 };
 
 struct c3_str c3photoC(double Qp, double Tleaf, double RH, double Vcmax0, double Jmax0, double tpu_rate_max,
