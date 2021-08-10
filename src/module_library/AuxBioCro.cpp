@@ -715,7 +715,7 @@ double SoilEvapo(double LAI, double k, double air_temperature, double ppfd, doub
     double vapor_density_deficit = SWVC * (1 - RelH / 100);
 
     double BoundaryLayerThickness = 4e-3 * sqrt(soil_clod_size / winds);
-    double DiffCoef = 2.126e-5 * 1.48e-7 * SoilTemp;
+    double DiffCoef = 2.126e-5 + 1.48e-7 * SoilTemp;
     double SoilBoundaryLayer = DiffCoef / BoundaryLayerThickness;
 
     double Ja = 2 * TotalRadiation * ((1 - soil_reflectance - soil_transmission) / (1 - soil_transmission));
