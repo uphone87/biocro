@@ -61,6 +61,7 @@ class partitioning_coefficient_logistic : public SteadyModule
           betaStem{get_input(input_parameters, "betaStem")},
           betaLeaf{get_input(input_parameters, "betaLeaf")},
           kRhizome_emr{get_input(input_parameters, "kRhizome_emr")},
+          ScaleFactor{get_input(input_parameters, "ScaleFactor")},
 
           // Get pointers to output parameters
           kStem_op{get_op(output_parameters, "kStem")},
@@ -83,6 +84,7 @@ class partitioning_coefficient_logistic : public SteadyModule
     const double& betaStem;
     const double& betaLeaf;
     const double& kRhizome_emr;
+    const double& ScaleFactor;
 
     // Pointers to output parameters
     double* kStem_op;
@@ -105,7 +107,8 @@ string_vector partitioning_coefficient_logistic::get_inputs()
         "betaRoot",     // dimensionless
         "betaStem",     // dimensionless
         "betaLeaf",     // dimensionless
-        "kRhizome_emr"  // dimensionless
+        "kRhizome_emr",  // dimensionless
+        "ScaleFactor"  // dimensionless
     };
 }
 
@@ -126,12 +129,14 @@ void partitioning_coefficient_logistic::do_operation() const
     // from Osborne et al., 2015 JULES-crop https://doi.org/10.5194/gmd-8-1139-2015
 
     // denominator term for kRoot, kStem, kLeaf, and kGrain
-    double kDenom = exp(alphaRoot + betaRoot * DVI) + exp(alphaLeaf + betaLeaf * DVI)
-                    + exp(alphaStem + betaStem * DVI) + 1.0; // dimensionless
+    double alphaLeaf_new = alphaLeaf * ScaleFactor; 
+    double alphaStem_new = alphaStem * ScaleFactor;
+    double kDenom = exp(alphaRoot + betaRoot * DVI) + exp(alphaLeaf_new + betaLeaf * DVI)
+                    + exp(alphaStem_new + betaStem * DVI) + 1.0; // dimensionless
 
     double kRoot = kcoeff(alphaRoot, betaRoot, DVI, kDenom); // dimensionless
-    double kStem = kcoeff(alphaStem, betaStem, DVI, kDenom); // dimensionless
-    double kLeaf = kcoeff(alphaLeaf, betaLeaf, DVI, kDenom); // dimensionless
+    double kStem = kcoeff(alphaStem_new, betaStem, DVI, kDenom); // dimensionless
+    double kLeaf = kcoeff(alphaLeaf_new, betaLeaf, DVI, kDenom); // dimensionless
     double kGrain = 1.0 / kDenom; // dimensionless
 
     // Give option for rhizome to contribute to growth during the emergence stage,
