@@ -81,6 +81,9 @@ class c3_assimilation : public DerivModule
           water_stress_approach(get_input(input_parameters, "water_stress_approach")),
           electrons_per_carboxylation(get_input(input_parameters, "electrons_per_carboxylation")),
           electrons_per_oxygenation(get_input(input_parameters, "electrons_per_oxygenation")),
+          sfac1(get_input(input_parameters, "sfac1")),
+          sfac2(get_input(input_parameters, "sfac2")),
+          DVI(get_input(input_parameters, "DVI")),
 
           // Get pointers to output parameters
           Assim_op(get_op(output_parameters, "Assim")),
@@ -112,6 +115,9 @@ class c3_assimilation : public DerivModule
     double const& water_stress_approach;
     double const& electrons_per_carboxylation;
     double const& electrons_per_oxygenation;
+    double const& sfac1;
+    double const& sfac2;
+    double const& DVI;
 
     // Pointers to output parameters
     double* Assim_op;
@@ -143,7 +149,10 @@ std::vector<std::string> c3_assimilation::get_inputs()
         "StomataWS",                    // dimensionless
         "water_stress_approach",        // dimensionless
         "electrons_per_carboxylation",  // self-explanatory units
-        "electrons_per_oxygenation"     // self-explanatory units
+        "electrons_per_oxygenation",     // self-explanatory units
+        "sfac1",     // self-explanatory units
+        "sfac2",     // self-explanatory units
+        "DVI"     // self-explanatory units
     };
 }
 
@@ -177,7 +186,7 @@ void c3_assimilation::do_operation() const
         StomataWS,
         water_stress_approach,
         electrons_per_carboxylation,
-        electrons_per_oxygenation);
+        electrons_per_oxygenation,sfac1,sfac2,DVI);
 
     // Update the output parameter list
     update(Assim_op, c3_results.Assim);

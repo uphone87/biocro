@@ -1,6 +1,7 @@
 #ifndef C3_LEAF_PHOTOSYNTHESIS_H
 #define C3_LEAF_PHOTOSYNTHESIS_H
 
+#include <iostream>
 #include "../modules.h"
 #include "c3photo.hpp"  // for c3photoC
 #include "BioCro.h"     // for c3EvapoTrans
@@ -43,6 +44,9 @@ class c3_leaf_photosynthesis : public SteadyModule
           windspeed(get_input(input_parameters, "windspeed")),
           height(get_input(input_parameters, "height")),
           specific_heat_of_air(get_input(input_parameters, "specific_heat_of_air")),
+          sfac1(get_input(input_parameters, "sfac1")),
+          sfac2(get_input(input_parameters, "sfac2")),
+          DVI(get_input(input_parameters, "DVI")),
 
           // Get pointers to output parameters
           Assim_op(get_op(output_parameters, "Assim")),
@@ -84,6 +88,9 @@ class c3_leaf_photosynthesis : public SteadyModule
     double const& windspeed;
     double const& height;
     double const& specific_heat_of_air;
+    double const& sfac1;
+    double const& sfac2;
+    double const& DVI;
 
     // Pointers to output parameters
     double* Assim_op;
@@ -125,7 +132,10 @@ std::vector<std::string> c3_leaf_photosynthesis::get_inputs()
         "incident_average_par",         // J / (m^2 leaf) / s
         "windspeed",                    // m / s
         "height",                       // m
-        "specific_heat_of_air"          // J / kg / K
+        "specific_heat_of_air",          // J / kg / K
+        "sfac1",          //dimensionless 
+        "sfac2",          //dimensionless 
+        "DVI"          //dimensionless 
     };
 }
 
@@ -155,7 +165,7 @@ void c3_leaf_photosynthesis::do_operation() const
                                                     incident_par_micromol, temp, rh, vmax1, jmax, tpu_rate_max,
                                                     Rd, b0, b1, Gs_min, Catm, atmospheric_pressure, O2, theta,
                                                     StomataWS, water_stress_approach,
-                                                    electrons_per_carboxylation, electrons_per_oxygenation)
+                                                    electrons_per_carboxylation, electrons_per_oxygenation,sfac1,sfac2,DVI)
                                                     .Gs;  // mmol / m^2 / s
 
     // Calculate a new value for leaf temperature
@@ -169,8 +179,9 @@ void c3_leaf_photosynthesis::do_operation() const
     const struct c3_str photo = c3photoC(
         incident_par_micromol, leaf_temperature, rh, vmax1, jmax, tpu_rate_max,
         Rd, b0, b1, Gs_min, Catm, atmospheric_pressure, O2, theta, StomataWS,
-        water_stress_approach, electrons_per_carboxylation, electrons_per_oxygenation);
+        water_stress_approach, electrons_per_carboxylation, electrons_per_oxygenation,sfac1,sfac2,DVI);
 
+//    std::cout<<"initial_stomatal_conductance "<<initial_stomatal_conductance<<std::endl;
     // Update the outputs
     update(Assim_op, photo.Assim);
     update(GrossAssim_op, photo.GrossAssim);
