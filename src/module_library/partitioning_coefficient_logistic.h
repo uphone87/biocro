@@ -57,9 +57,11 @@ class partitioning_coefficient_logistic : public SteadyModule
           alphaRoot{get_input(input_parameters, "alphaRoot")},
           alphaStem{get_input(input_parameters, "alphaStem")},
           alphaLeaf{get_input(input_parameters, "alphaLeaf")},
+          alphaPod{get_input(input_parameters, "alphaPod")},
           betaRoot{get_input(input_parameters, "betaRoot")},
           betaStem{get_input(input_parameters, "betaStem")},
           betaLeaf{get_input(input_parameters, "betaLeaf")},
+          betaPod{get_input(input_parameters, "betaPod")},
           kRhizome_emr{get_input(input_parameters, "kRhizome_emr")},
           ScaleFactor{get_input(input_parameters, "ScaleFactor")},
 
@@ -68,6 +70,7 @@ class partitioning_coefficient_logistic : public SteadyModule
           kLeaf_op{get_op(output_parameters, "kLeaf")},
           kRoot_op{get_op(output_parameters, "kRoot")},
           kRhizome_op{get_op(output_parameters, "kRhizome")},
+          kPod_op{get_op(output_parameters, "kPod")},
           kGrain_op{get_op(output_parameters, "kGrain")}
     {
     }
@@ -80,9 +83,11 @@ class partitioning_coefficient_logistic : public SteadyModule
     const double& alphaRoot;
     const double& alphaStem;
     const double& alphaLeaf;
+    const double& alphaPod;
     const double& betaRoot;
     const double& betaStem;
     const double& betaLeaf;
+    const double& betaPod;
     const double& kRhizome_emr;
     const double& ScaleFactor;
 
@@ -91,6 +96,7 @@ class partitioning_coefficient_logistic : public SteadyModule
     double* kLeaf_op;
     double* kRoot_op;
     double* kRhizome_op;
+    double* kPod_op;
     double* kGrain_op;
 
     // Implement the pure virtual function do_operation():
@@ -104,9 +110,11 @@ string_vector partitioning_coefficient_logistic::get_inputs()
         "alphaRoot",    // dimensionless
         "alphaStem",    // dimensionless
         "alphaLeaf",    // dimensionless
+        "alphaPod",    // dimensionless
         "betaRoot",     // dimensionless
         "betaStem",     // dimensionless
         "betaLeaf",     // dimensionless
+        "betaPod",     // dimensionless
         "kRhizome_emr",  // dimensionless
         "ScaleFactor"  // dimensionless
     };
@@ -119,6 +127,7 @@ string_vector partitioning_coefficient_logistic::get_outputs()
         "kLeaf",     // dimesnionless
         "kRoot",     // dimensionless
         "kRhizome",  // dimensionless
+        "kPod",     // dimensionless
         "kGrain"     // dimensionless
     };
 }
@@ -129,21 +138,20 @@ void partitioning_coefficient_logistic::do_operation() const
     // from Osborne et al., 2015 JULES-crop https://doi.org/10.5194/gmd-8-1139-2015
 
     // denominator term for kRoot, kStem, kLeaf, and kGrain
-    //double alphaLeaf_new = alphaLeaf * ScaleFactor; 
-    //double alphaStem_new = alphaStem * ScaleFactor;
     double kDenom = exp(alphaRoot + betaRoot * DVI) +  exp(alphaLeaf + betaLeaf * DVI)
-                    + exp(alphaStem + betaStem * DVI) + 1.0; // dimensionless
+                    + exp(alphaStem + betaStem * DVI) + exp(alphaPod + betaPod * DVI) + 1.0; // dimensionless
 
     double kRoot = kcoeff(alphaRoot, betaRoot, DVI, kDenom); // dimensionless
     double kStem = kcoeff(alphaStem, betaStem, DVI, kDenom); // dimensionless
     double kLeaf = kcoeff(alphaLeaf, betaLeaf, DVI, kDenom); // dimensionless
+    double kPod  = kcoeff(alphaPod, betaPod, DVI, kDenom); // dimensionless
     double kGrain = 1.0 / kDenom; // dimensionless
 
-    double extra_kleaf = (1-ScaleFactor)*kLeaf/3;
-    kRoot = kRoot + extra_kleaf;
-    kStem = kStem + extra_kleaf;
-    kGrain = kGrain + extra_kleaf;
-    kLeaf = ScaleFactor * kLeaf;
+//    double extra_kleaf = (1-ScaleFactor)*kLeaf/3;
+//    kRoot = kRoot + extra_kleaf;
+//    kStem = kStem + extra_kleaf;
+//    kGrain = kGrain + extra_kleaf;
+//    kLeaf = ScaleFactor * kLeaf;
     // Give option for rhizome to contribute to growth during the emergence stage,
     // kRhizome_emr is an input parameter and should be non-positive.
     // To ignore rhizome, set kRhizome_emr to 0 in input parameter file, and
@@ -160,6 +168,7 @@ void partitioning_coefficient_logistic::do_operation() const
     update(kLeaf_op, kLeaf);        //dimensionless
     update(kRoot_op, kRoot);        //dimensionless
     update(kRhizome_op, kRhizome);  //dimensionless
+    update(kPod_op, kPod);        //dimensionless
     update(kGrain_op, kGrain);      //dimensionless
 }
 

@@ -119,11 +119,11 @@ struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, dou
 
         co2_assimilation_rate = Vc - Rd;
 
-        if(DVI<1){
+        //if(DVI<1){
                  co2_assimilation_rate *= quantity<dimensionless>(sfac1);
-        }else{
-                 co2_assimilation_rate *= quantity<dimensionless>(sfac2);
-        }
+        //}else{
+        //         co2_assimilation_rate *= quantity<dimensionless>(sfac2);
+        //}
 
         if (water_stress_approach == 0) co2_assimilation_rate *= quantity<dimensionless>(StomWS);
         /* milimole per meter square per second*/

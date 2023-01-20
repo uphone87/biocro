@@ -67,6 +67,7 @@ class no_leaf_resp_neg_assim_partitioning_growth_calculator : public SteadyModul
           kStem{get_input(input_parameters, "kStem")},
           kRoot{get_input(input_parameters, "kRoot")},
           kRhizome{get_input(input_parameters, "kRhizome")},
+          kPod{get_input(input_parameters, "kPod")},
           kGrain{get_input(input_parameters, "kGrain")},
           canopy_assimilation_rate{get_input(input_parameters, "canopy_assimilation_rate")},
           mrc1{get_input(input_parameters, "mrc1")},
@@ -79,6 +80,7 @@ class no_leaf_resp_neg_assim_partitioning_growth_calculator : public SteadyModul
           net_assimilation_rate_stem_op{get_op(output_parameters, "net_assimilation_rate_stem")},
           net_assimilation_rate_root_op{get_op(output_parameters, "net_assimilation_rate_root")},
           net_assimilation_rate_rhizome_op{get_op(output_parameters, "net_assimilation_rate_rhizome")},
+          net_assimilation_rate_pod_op{get_op(output_parameters, "net_assimilation_rate_pod")},
           net_assimilation_rate_grain_op{get_op(output_parameters, "net_assimilation_rate_grain")}
     {
     }
@@ -91,6 +93,7 @@ class no_leaf_resp_neg_assim_partitioning_growth_calculator : public SteadyModul
     const double& kStem;
     const double& kRoot;
     const double& kRhizome;
+    const double& kPod;
     const double& kGrain;
     const double& canopy_assimilation_rate;
     const double& mrc1;
@@ -103,6 +106,7 @@ class no_leaf_resp_neg_assim_partitioning_growth_calculator : public SteadyModul
     double* net_assimilation_rate_stem_op;
     double* net_assimilation_rate_root_op;
     double* net_assimilation_rate_rhizome_op;
+    double* net_assimilation_rate_pod_op;
     double* net_assimilation_rate_grain_op;
 
     // Implement the pure virtual function do_operation():
@@ -116,6 +120,7 @@ string_vector no_leaf_resp_neg_assim_partitioning_growth_calculator::get_inputs(
         "kStem",                     // dimensionless
         "kRoot",                     // dimensionless
         "kRhizome",                  // dimensionless
+        "kPod",                    // dimensionless
         "kGrain",                    // dimensionless
         "canopy_assimilation_rate",  // Mg / ha / hour
         "mrc1",                      // dimensionless
@@ -132,6 +137,7 @@ string_vector no_leaf_resp_neg_assim_partitioning_growth_calculator::get_outputs
         "net_assimilation_rate_stem",     // Mg / ha / hour
         "net_assimilation_rate_root",     // Mg / ha / hour
         "net_assimilation_rate_rhizome",  // Mg / ha / hour
+        "net_assimilation_rate_pod",     // Mg / ha / hour
         "net_assimilation_rate_grain"     // Mg / ha / hour
     };
 }
@@ -142,6 +148,7 @@ void no_leaf_resp_neg_assim_partitioning_growth_calculator::do_operation() const
     double net_assimilation_rate_stem{0.0};
     double net_assimilation_rate_root{0.0};
     double net_assimilation_rate_rhizome{0.0};
+    double net_assimilation_rate_pod{0.0};
     double net_assimilation_rate_grain{0.0};
 
     // Calculate the rate of new leaf production
@@ -175,6 +182,13 @@ void no_leaf_resp_neg_assim_partitioning_growth_calculator::do_operation() const
         net_assimilation_rate_rhizome = 0.0;
     }
 
+    // Calculate the rate of new pod production
+    if (kPod > 0) {
+        net_assimilation_rate_pod = canopy_assimilation_rate * kPod;
+    } else {
+        net_assimilation_rate_pod = 0.0;
+    }
+
     // Calculate the rate of new grain production
     if (kGrain > 0) {
         net_assimilation_rate_grain = canopy_assimilation_rate * kGrain;
@@ -187,6 +201,7 @@ void no_leaf_resp_neg_assim_partitioning_growth_calculator::do_operation() const
     update(net_assimilation_rate_stem_op, net_assimilation_rate_stem);
     update(net_assimilation_rate_root_op, net_assimilation_rate_root);
     update(net_assimilation_rate_rhizome_op, net_assimilation_rate_rhizome);
+    update(net_assimilation_rate_pod_op, net_assimilation_rate_pod);
     update(net_assimilation_rate_grain_op, net_assimilation_rate_grain);
 }
 
