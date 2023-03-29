@@ -60,6 +60,7 @@ class soybean_development_rate_calculator : public SteadyModule
 
           // Get references to input parameters
           maturity_group{get_input(input_parameters, "maturity_group")},
+          maturity_group_map{get_input(input_parameters, "maturity_group_map")},
           DVI{get_input(input_parameters, "DVI")},
           day_length{get_input(input_parameters, "day_length")},
           temp{get_input(input_parameters, "temp")},
@@ -75,6 +76,8 @@ class soybean_development_rate_calculator : public SteadyModule
           Tmin_R1R7{get_input(input_parameters, "Tmin_R1R7")},
           Topt_R1R7{get_input(input_parameters, "Topt_R1R7")},
           Tmax_R1R7{get_input(input_parameters, "Tmax_R1R7")},
+          sfdvi1{get_input(input_parameters, "sfdvi1")},
+          sfdvi2{get_input(input_parameters, "sfdvi2")},
 
           // Get pointers to output parameters
           development_rate_per_hour_op{get_op(output_parameters, "development_rate_per_hour")}
@@ -86,6 +89,7 @@ class soybean_development_rate_calculator : public SteadyModule
    private:
     // References to input parameters
     const double& maturity_group;
+    const double& maturity_group_map;
     const double& DVI;
     const double& day_length;
     const double& temp;
@@ -101,6 +105,8 @@ class soybean_development_rate_calculator : public SteadyModule
     const double& Tmin_R1R7;
     const double& Topt_R1R7;
     const double& Tmax_R1R7;
+    const double& sfdvi1;
+    const double& sfdvi2;
 
     // Pointers to output parameters
     double* development_rate_per_hour_op;
@@ -113,6 +119,7 @@ string_vector soybean_development_rate_calculator::get_inputs()
 {
     return {
         "maturity_group",   // dimensionless; maturity group of soybean cultivar
+        "maturity_group_map",   // dimensionless; maturity group of soybean cultivar
         "DVI",              // dimensionless; development index, see Osborne et al. 2015
         "day_length",       // hours
         "temp",             // degrees C
@@ -128,6 +135,8 @@ string_vector soybean_development_rate_calculator::get_inputs()
         "Tmin_R1R7",        // degrees C
         "Topt_R1R7",        // degrees C
         "Tmax_R1R7",        // degrees C
+        "sfdvi1",        // 
+        "sfdvi2",        // 
     };
 }
 
@@ -202,9 +211,15 @@ void soybean_development_rate_calculator::do_operation() const
         soybean_development_rate = Rmax_R1R7 *
             tempFunc(temp, Tmin_R1R7, Topt_R1R7, Tmax_R1R7) *
             photoFunc(day_length, Popt_R1R7, Pcrit_R1R7); // day^-1
-    }
 
-    double development_rate_per_hour = soybean_development_rate / 24.0; // hr^-1
+    }
+    //double sfdvi1_fit = -0.19739 * maturity_group_map + 1.87898;
+    if (DVI < 1) {
+        soybean_development_rate =  soybean_development_rate * sfdvi1;
+    } else {
+        soybean_development_rate =  soybean_development_rate * sfdvi2;
+    }
+    double development_rate_per_hour =  soybean_development_rate / 24.0; // hr^-1
 
     // Update the output parameter list
     update(development_rate_per_hour_op, development_rate_per_hour);

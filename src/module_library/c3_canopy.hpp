@@ -46,6 +46,9 @@ class c3_canopy : public SteadyModule
           water_stress_approach_ip(get_ip(input_parameters, "water_stress_approach")),
           electrons_per_carboxylation_ip(get_ip(input_parameters, "electrons_per_carboxylation")),
           electrons_per_oxygenation_ip(get_ip(input_parameters, "electrons_per_oxygenation")),
+          sfac1_ip(get_ip(input_parameters, "sfac1")),
+          sfac2_ip(get_ip(input_parameters, "sfac2")),
+          DVI_ip(get_ip(input_parameters, "DVI")),
           absorptivity_par_ip(get_ip(input_parameters, "absorptivity_par")),
 
           // Get pointers to output parameters
@@ -92,6 +95,9 @@ class c3_canopy : public SteadyModule
     const double* water_stress_approach_ip;
     const double* electrons_per_carboxylation_ip;
     const double* electrons_per_oxygenation_ip;
+    const double* sfac1_ip;
+    const double* sfac2_ip;
+    const double* DVI_ip;
     const double* absorptivity_par_ip;
 
     // Pointers to output parameters

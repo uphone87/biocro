@@ -78,6 +78,7 @@ parameter_list parameters {
   { "Leaf"                              , {"Mass of leaves per ground area"                                           ,"Mg / ha"                      }},
   { "Stem"                              , {"Mass of stems per ground area"                                            ,"Mg / ha"                      }},
   { "Root"                              , {"Mass of roots per ground area"                                            ,"Mg / ha"                      }},
+  { "Pod"                             , {"Mass of pod (excl. seed) per ground area"                                            ,"Mg / ha"                      }},
   { "Grain"                             , {"Mass of grain per ground area"                                            ,"Mg / ha"                      }},
   { "Rhizome"                           , {"Mass of rhizomes per ground area"                                         ,"Mg / ha"                      }},
   { "acceleration_from_gravity"         , {"Accerlation from gravity"                                                 ,"m / s^2"                      }},

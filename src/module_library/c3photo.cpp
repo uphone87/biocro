@@ -24,7 +24,7 @@ quantity<dimensionless> arrhenius_exponent(quantity<dimensionless> c, quantity<e
 
 struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, double _Jmax0, double _TPU_rate_max,
                double _Rd0, double bb0, double bb1, double Gs_min, double Ca, double AP, double _O2,
-               double thet, double StomWS, int water_stress_approach, double electrons_per_carboxylation, double electrons_per_oxygenation)
+               double thet, double StomWS, int water_stress_approach, double electrons_per_carboxylation, double electrons_per_oxygenation,double sfac1, double sfac2, double DVI)
 {
     // Assign units to the input parameters. The parameters can be renamed and this section can be removed when call functions
     // that call c3photoC() are also using units.
@@ -118,6 +118,12 @@ struct c3_str c3photoC(double _Qp, double _Tleaf, double RH, double _Vcmax0, dou
         }
 
         co2_assimilation_rate = Vc - Rd;
+
+        //if(DVI<1){
+                 co2_assimilation_rate *= quantity<dimensionless>(sfac1);
+        //}else{
+        //         co2_assimilation_rate *= quantity<dimensionless>(sfac2);
+        //}
 
         if (water_stress_approach == 0) co2_assimilation_rate *= quantity<dimensionless>(StomWS);
         /* milimole per meter square per second*/

@@ -1,6 +1,7 @@
 #ifndef MULTILAYER_CANOPY_INTEGRATOR_H
 #define MULTILAYER_CANOPY_INTEGRATOR_H
-
+#include <iostream>
+#include <cmath>
 #include "../modules.h"
 
 /**
@@ -39,6 +40,8 @@ class multilayer_canopy_integrator : public SteadyModule
           // Get references to input parameters
           lai(get_input(input_parameters, "lai")),
           growth_respiration_fraction(get_input(input_parameters, "growth_respiration_fraction")),
+	  time(get_input(input_parameters, "time")),
+	  resp_max(get_input(input_parameters, "resp_max")),
           // Get pointers to output parameters
           canopy_assimilation_rate_op(get_op(output_parameters, "canopy_assimilation_rate")),
           canopy_transpiration_rate_op(get_op(output_parameters, "canopy_transpiration_rate")),
@@ -66,6 +69,8 @@ class multilayer_canopy_integrator : public SteadyModule
     // References to input parameters
     const double& lai;
     const double& growth_respiration_fraction;
+    const double& time;
+    const double& resp_max;
     // Pointers to output parameters
     double* canopy_assimilation_rate_op;
     double* canopy_transpiration_rate_op;
@@ -138,6 +143,10 @@ void multilayer_canopy_integrator::run() const
     double canopy_transpiration_rate = 0;
     double canopy_conductance = 0;
     double GrossAssim = 0;
+    double doy = floor(time);            // Round time down to get the day of year
+    double t0 = 168,time_star = 210;
+    double k=log(3) / (time_star - t0);
+    double growth_respiration_fraction_new = 2.0*resp_max/(1.0+exp(k*(doy-t0))); 
 
     // Integrate assimilation, transpiration, and conductance throughout the canopy
     for (int i = 0; i < nlayers; ++i) {
@@ -172,6 +181,7 @@ void multilayer_canopy_integrator::run() const
     // 1e-6 - megagrams per  gram
     // 10000 - meters squared per hectare
 
+//    std::cout<<"canopy_assimilation_rate "<<canopy_assimilation_rate* 3600 * 1e-6 * 30 * 1e-6 * 10000<<std::endl;
     update(canopy_assimilation_rate_op, canopy_assimilation_rate * 3600 * 1e-6 * 30 * 1e-6 * 10000);
     update(GrossAssim_op, GrossAssim * 3600 * 1e-6 * 30 * 1e-6 * 10000);
     update(canopy_transpiration_rate_op, canopy_transpiration_rate * 3600 * 1e-3 * 18 * 1e-6 * 10000);

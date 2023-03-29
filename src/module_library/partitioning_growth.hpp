@@ -72,11 +72,13 @@ class partitioning_growth : public DerivModule
           kStem{get_input(input_parameters, "kStem")},
           kRoot{get_input(input_parameters, "kRoot")},
           kRhizome{get_input(input_parameters, "kRhizome")},
+          kPod{get_input(input_parameters, "kPod")},
           kGrain{get_input(input_parameters, "kGrain")},
           net_assimilation_rate_leaf{get_input(input_parameters, "net_assimilation_rate_leaf")},
           net_assimilation_rate_stem{get_input(input_parameters, "net_assimilation_rate_stem")},
           net_assimilation_rate_root{get_input(input_parameters, "net_assimilation_rate_root")},
           net_assimilation_rate_rhizome{get_input(input_parameters, "net_assimilation_rate_rhizome")},
+          net_assimilation_rate_pod{get_input(input_parameters, "net_assimilation_rate_pod")},
           net_assimilation_rate_grain{get_input(input_parameters, "net_assimilation_rate_grain")},
           Leaf{get_input(input_parameters, "Leaf")},
           Stem{get_input(input_parameters, "Stem")},
@@ -88,6 +90,7 @@ class partitioning_growth : public DerivModule
           Stem_op{get_op(output_parameters, "Stem")},
           Root_op{get_op(output_parameters, "Root")},
           Rhizome_op{get_op(output_parameters, "Rhizome")},
+          Pod_op{get_op(output_parameters, "Pod")},
           Grain_op{get_op(output_parameters, "Grain")}
     {
     }
@@ -102,11 +105,13 @@ class partitioning_growth : public DerivModule
     const double& kStem;
     const double& kRoot;
     const double& kRhizome;
+    const double& kPod;
     const double& kGrain;
     const double& net_assimilation_rate_leaf;
     const double& net_assimilation_rate_stem;
     const double& net_assimilation_rate_root;
     const double& net_assimilation_rate_rhizome;
+    const double& net_assimilation_rate_pod;
     const double& net_assimilation_rate_grain;
     const double& Leaf;
     const double& Stem;
@@ -118,6 +123,7 @@ class partitioning_growth : public DerivModule
     double* Stem_op;
     double* Root_op;
     double* Rhizome_op;
+    double* Pod_op;
     double* Grain_op;
 
     // Implement the pure virtual function do_operation():
@@ -133,11 +139,13 @@ string_vector partitioning_growth::get_inputs()
         "kStem",                          // dimensionless
         "kRoot",                          // dimensionless
         "kRhizome",                       // dimensionless
+        "kPod",                          // dimensionless
         "kGrain",                         // dimensionless
         "net_assimilation_rate_leaf",     // Mg / ha / hour
         "net_assimilation_rate_stem",     // Mg / ha / hour
         "net_assimilation_rate_root",     // Mg / ha / hour
         "net_assimilation_rate_rhizome",  // Mg / ha / hour
+        "net_assimilation_rate_pod",  // Mg / ha / hour
         "net_assimilation_rate_grain",    // Mg / ha / hour
         "Leaf",                           // Mg / ha
         "Stem",                           // Mg / ha
@@ -153,6 +161,7 @@ string_vector partitioning_growth::get_outputs()
         "Stem",     // Mg / ha / hour
         "Root",     // Mg / ha / hour
         "Rhizome",  // Mg / ha / hour
+        "Pod",     // Mg / ha / hour
         "Grain"     // Mg / ha / hour
     };
 }
@@ -164,6 +173,7 @@ void partitioning_growth::do_operation() const
     double dStem{0.0};
     double dRoot{0.0};
     double dRhizome{0.0};
+    double dPod{0.0};
     double dGrain{0.0};
 
     // Determine whether Leaf is growing or decaying
@@ -174,6 +184,7 @@ void partitioning_growth::do_operation() const
         dRhizome += kRhizome * (-dLeaf) * retrans;
         dStem += kStem * (-dLeaf) * retrans;
         dRoot += kRoot * (-dLeaf) * retrans;
+        dPod  += kPod* (-dLeaf) * retrans;
         dGrain += kGrain * (-dLeaf) * retrans;
     }
 
@@ -185,6 +196,7 @@ void partitioning_growth::do_operation() const
         dRhizome += kRhizome * (-dStem) * retrans;
         dLeaf += kLeaf * (-dStem) * retrans;
         dRoot += kRoot * (-dStem) * retrans;
+        dPod  += kPod * (-dStem) * retrans;
         dGrain += kGrain * (-dStem) * retrans;
     }
 
@@ -196,6 +208,7 @@ void partitioning_growth::do_operation() const
         dRhizome += kRhizome * (-dRoot) * retrans;
         dStem += kStem * (-dRoot) * retrans;
         dLeaf += kLeaf * (-dRoot) * retrans;
+        dPod  += kPod * (-dRoot) * retrans;
         dGrain += kGrain * (-dRoot) * retrans;
     }
 
@@ -211,7 +224,12 @@ void partitioning_growth::do_operation() const
         dRoot += kRoot * (-dRhizome) * retrans_rhizome;
         dStem += kStem * (-dRhizome) * retrans_rhizome;
         dLeaf += kLeaf * (-dRhizome) * retrans_rhizome;
+        dPod += kPod * (-dRhizome) * retrans_rhizome;
         dGrain += kGrain * (-dRhizome) * retrans_rhizome;
+    }
+
+    if (kPod> 0.0) {
+        dPod+= net_assimilation_rate_pod;
     }
 
     // Determine whether Grain is growing
@@ -224,6 +242,7 @@ void partitioning_growth::do_operation() const
     update(Stem_op, dStem);
     update(Root_op, dRoot);
     update(Rhizome_op, dRhizome);
+    update(Pod_op, dPod);
     update(Grain_op, dGrain);
 }
 

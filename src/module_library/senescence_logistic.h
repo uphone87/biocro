@@ -38,6 +38,7 @@ class senescence_logistic : public DerivModule
           kStem{get_input(input_parameters, "kStem")},
           kRoot{get_input(input_parameters, "kRoot")},
           kRhizome{get_input(input_parameters, "kRhizome")},
+          kPod{get_input(input_parameters, "kPod")},
           kGrain{get_input(input_parameters, "kGrain")},
           remobilization_fraction{get_input(input_parameters, "remobilization_fraction")},
 
@@ -50,6 +51,7 @@ class senescence_logistic : public DerivModule
           RootLitter_op{get_op(output_parameters, "RootLitter")},
           Rhizome_op{get_op(output_parameters, "Rhizome")},
           RhizomeLitter_op{get_op(output_parameters, "RhizomeLitter")},
+          Pod_op{get_op(output_parameters, "Pod")},
           Grain_op{get_op(output_parameters, "Grain")}
     {
     }
@@ -70,6 +72,7 @@ class senescence_logistic : public DerivModule
     const double& kStem;
     const double& kRoot;
     const double& kRhizome;
+    const double& kPod;
     const double& kGrain;
     const double& remobilization_fraction;
 
@@ -82,6 +85,7 @@ class senescence_logistic : public DerivModule
     double* RootLitter_op;
     double* Rhizome_op;
     double* RhizomeLitter_op;
+    double* Pod_op;
     double* Grain_op;
 
     // Implement the pure virtual function do_operation():
@@ -107,6 +111,7 @@ string_vector senescence_logistic::get_inputs()
                                    // Root
         "kRhizome",                // dimensionless, fraction carbon allocated to
                                    // Rhizome
+        "kPod",                    // dimensionless, fraction carbon allocated to Pod
         "kGrain",                  // dimensionless, fraction carbon allocated to
                                    // Grain
         "remobilization_fraction"  // dimensionless, fraction of senesced leaf
@@ -125,6 +130,7 @@ string_vector senescence_logistic::get_outputs()
         "RootLitter",     // Mg / ha
         "Rhizome",        // Mg / ha
         "RhizomeLitter",  // Mg / ha
+        "Pod",            // Mg / ha
         "Grain"           // Mg / ha
     };
 }
@@ -166,10 +172,13 @@ void senescence_logistic::do_operation() const
     // currently do not include grain senescence.
     double dGrain = kGrain * senescence_leaf * remobilization_fraction;  // Mg / ha
 
+    double dPod   = kPod   * senescence_leaf * remobilization_fraction;  // Mg / ha
+
     update(Leaf_op, dLeaf);                    // Mg / ha
     update(Stem_op, dStem);                    // Mg / ha
     update(Root_op, dRoot);                    // Mg / ha
     update(Rhizome_op, dRhizome);              // Mg / ha
+    update(Pod_op, dPod);                  // Mg / ha
     update(Grain_op, dGrain);                  // Mg / ha
     update(LeafLitter_op, dLeafLitter);        // Mg / ha
     update(StemLitter_op, dStemLitter);        // Mg / ha

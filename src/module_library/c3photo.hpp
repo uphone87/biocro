@@ -15,7 +15,7 @@ struct c3_str {
 
 struct c3_str c3photoC(double Qp, double Tleaf, double RH, double Vcmax0, double Jmax0, double tpu_rate_max,
         double Rd0, double bb0, double bb1, double Gs_min, double Ca, double AP, double O2, double theta,
-        double StomWS,int water_stress_approach, double electrons_per_carboxylation, double electrons_per_oxygenation);
+        double StomWS,int water_stress_approach, double electrons_per_carboxylation, double electrons_per_oxygenation, double sfac1, double sfac2,double DVI);
 
 struct c3_str c3photoCdb(double Qp, double Tleaf, double RH, double Vcmax0, double Jmax0, double tpu_rate_max,
         double Rd0, double bb0, double bb1, double Gs_min, double Ca, double AP, double O2, double theta,
